@@ -23,28 +23,13 @@ export function GranularPanel({ store, engine, buffer }: GranularPanelProps) {
         width={4 * PAD_SIZE + 3 * 48}
       />
 
-      {/* Main XY pads: position, size, spread, pitch */}
+      {/* Main XY pads with modulation depths underneath */}
       <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
-        <PadWithEnv store={store} xKey="position" yKey="positionJitter" envKey="env1Position" label="position" />
-        <PadWithEnv store={store} xKey="size" yKey="sizeJitter" envKey="env1Size" label="size" />
-        <PadWithEnv store={store} xKey="spread" yKey="spreadJitter" envKey="env1Spread" label="spread" />
-        <PadWithEnv store={store} xKey="pitch" yKey="pitchJitter" envKey="env1Pitch" label="pitch" />
+        <PadWithMods store={store} xKey="position" yKey="positionJitter" envKey="env1Position" lfo1Key="lfo1Position" lfo2Key="lfo2Position" label="position" />
+        <PadWithMods store={store} xKey="size" yKey="sizeJitter" envKey="env1Size" lfo1Key="lfo1Size" lfo2Key="lfo2Size" label="size" />
+        <PadWithMods store={store} xKey="spread" yKey="spreadJitter" envKey="env1Spread" lfo1Key="lfo1Spread" lfo2Key="lfo2Spread" label="spread" />
+        <PadWithMods store={store} xKey="pitch" yKey="pitchJitter" envKey="env1Pitch" lfo1Key="lfo1Pitch" lfo2Key="lfo2Pitch" label="pitch" />
       </div>
-
-      {/* LFO mod depth labels */}
-      <Section title="LFO 1">
-        <LabelControl store={store} paramKey="lfo1Position" label="pos" />
-        <LabelControl store={store} paramKey="lfo1Size" label="size" />
-        <LabelControl store={store} paramKey="lfo1Spread" label="sprd" />
-        <LabelControl store={store} paramKey="lfo1Pitch" label="pitch" />
-      </Section>
-
-      <Section title="LFO 2">
-        <LabelControl store={store} paramKey="lfo2Position" label="pos" />
-        <LabelControl store={store} paramKey="lfo2Size" label="size" />
-        <LabelControl store={store} paramKey="lfo2Spread" label="sprd" />
-        <LabelControl store={store} paramKey="lfo2Pitch" label="pitch" />
-      </Section>
 
       {/* Single-axis pads and controls */}
       <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "flex-start" }}>
@@ -63,41 +48,32 @@ export function GranularPanel({ store, engine, buffer }: GranularPanelProps) {
   );
 }
 
-/** XY pad paired with an envelope depth label control. */
-function PadWithEnv({
+/** XY pad with env, lfo1, lfo2 depth controls underneath. */
+function PadWithMods({
   store,
   xKey,
   yKey,
   envKey,
+  lfo1Key,
+  lfo2Key,
   label,
 }: {
   store: ParamStore;
   xKey: string;
   yKey: string;
   envKey: string;
+  lfo1Key: string;
+  lfo2Key: string;
   label: string;
 }) {
   return (
-    <div style={{ display: "flex", gap: 4, alignItems: "flex-end" }}>
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
       <XYPad store={store} xKey={xKey} yKey={yKey} label={label} size={PAD_SIZE} />
-      <LabelControl store={store} paramKey={envKey} label="env" />
-    </div>
-  );
-}
-
-function Section({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div>
-      <div style={{ fontSize: 11, color: "#888", marginBottom: 4, userSelect: "none" }}>
-        {title}
+      <div style={{ display: "flex", gap: 4 }}>
+        <LabelControl store={store} paramKey={envKey} label="env" />
+        <LabelControl store={store} paramKey={lfo1Key} label="lfo1" />
+        <LabelControl store={store} paramKey={lfo2Key} label="lfo2" />
       </div>
-      <div style={{ display: "flex", gap: 16 }}>{children}</div>
     </div>
   );
 }
