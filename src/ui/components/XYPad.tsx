@@ -9,9 +9,10 @@ interface XYPadProps {
   yKey?: string;
   label: string;
   size?: number;
+  onDragStart?: () => void;
 }
 
-export function XYPad({ store, xKey, yKey, label, size = 96 }: XYPadProps) {
+export function XYPad({ store, xKey, yKey, label, size = 96, onDragStart }: XYPadProps) {
   const ref = useRef<HTMLDivElement>(null);
   const x = useParam(store, xKey);
   const y = yKey ? useParam(store, yKey) : 0.5;
@@ -37,8 +38,9 @@ export function XYPad({ store, xKey, yKey, label, size = 96 }: XYPadProps) {
     (e: RPointerEvent) => {
       (e.target as HTMLElement).setPointerCapture(e.pointerId);
       update(e);
+      onDragStart?.();
     },
-    [update],
+    [update, onDragStart],
   );
 
   return (

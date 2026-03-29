@@ -40,7 +40,7 @@ export function PositionControl({
     (e: RPointerEvent) => {
       (e.target as HTMLElement).setPointerCapture(e.pointerId);
       update(e);
-      engine?.sendCommand("envHold");
+      engine?.sendCommand("envAttack");
     },
     [update, engine],
   );

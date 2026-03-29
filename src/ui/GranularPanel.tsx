@@ -25,7 +25,7 @@ export function GranularPanel({ store, engine, buffer }: GranularPanelProps) {
 
       {/* Main XY pads with modulation depths underneath */}
       <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
-        <PadWithMods store={store} xKey="position" yKey="positionJitter" envKey="env1Position" lfo1Key="lfo1Position" lfo2Key="lfo2Position" label="position" />
+        <PadWithMods store={store} xKey="position" yKey="positionJitter" envKey="env1Position" lfo1Key="lfo1Position" lfo2Key="lfo2Position" label="position" onDragStart={() => engine?.sendCommand("envHold")} />
         <PadWithMods store={store} xKey="size" yKey="sizeJitter" envKey="env1Size" lfo1Key="lfo1Size" lfo2Key="lfo2Size" label="size" />
         <PadWithMods store={store} xKey="spread" yKey="spreadJitter" envKey="env1Spread" lfo1Key="lfo1Spread" lfo2Key="lfo2Spread" label="spread" />
         <PadWithMods store={store} xKey="pitch" yKey="pitchJitter" envKey="env1Pitch" lfo1Key="lfo1Pitch" lfo2Key="lfo2Pitch" label="pitch" />
@@ -57,6 +57,7 @@ function PadWithMods({
   lfo1Key,
   lfo2Key,
   label,
+  onDragStart,
 }: {
   store: ParamStore;
   xKey: string;
@@ -65,10 +66,11 @@ function PadWithMods({
   lfo1Key: string;
   lfo2Key: string;
   label: string;
+  onDragStart?: () => void;
 }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-      <XYPad store={store} xKey={xKey} yKey={yKey} label={label} size={PAD_SIZE} />
+      <XYPad store={store} xKey={xKey} yKey={yKey} label={label} size={PAD_SIZE} onDragStart={onDragStart} />
       <div style={{ display: "flex", gap: 4 }}>
         <LabelControl store={store} paramKey={envKey} label="env" />
         <LabelControl store={store} paramKey={lfo1Key} label="lfo1" />

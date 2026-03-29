@@ -37,8 +37,8 @@ class ASREnvelope {
     this.phasePos = 0;
     this.attackTime = 22050;
     this.releaseTime = 22050;
-    this.level = 0;
-    this.hold = false;
+    this.level = 1;
+    this.hold = true;
   }
   step() {
     if (this.hold) return;
@@ -48,12 +48,12 @@ class ASREnvelope {
           this.level = 1;
           this.stage = ENV_SUSTAIN;
         } else {
-          this.phasePos++;
-          this.level = this.phasePos / this.attackTime;
-          if (this.level >= 1) {
+          this.level = Math.min(this.phasePos / this.attackTime, 1);
+          if (this.phasePos >= this.attackTime) {
             this.level = 1;
             this.stage = ENV_SUSTAIN;
           }
+          this.phasePos++;
         }
         break;
       case ENV_SUSTAIN:
@@ -64,26 +64,27 @@ class ASREnvelope {
           this.level = 0;
           this.stage = ENV_IDLE;
         } else {
-          this.phasePos++;
-          this.level = 1 - this.phasePos / this.releaseTime;
+          this.level = Math.min((this.releaseTime - this.phasePos) / this.releaseTime, 1);
           if (this.level <= 0) {
             this.level = 0;
             this.stage = ENV_IDLE;
           }
+          this.phasePos++;
         }
         break;
     }
   }
-  triggerHold() {
-    this.hold = true;
-    this.stage = ENV_ATTACK;
-    this.phasePos = 0;
-    this.level = 0;
+  setHold(on) {
+    this.hold = on;
+    this.level = on ? 1 : 0;
   }
-  triggerRelease() {
-    this.hold = false;
-    this.stage = ENV_RELEASE;
+  reset() {
     this.phasePos = 0;
+    this.stage = ENV_ATTACK;
+  }
+  release() {
+    this.phasePos = 0;
+    this.stage = ENV_RELEASE;
   }
 }
 
@@ -217,16 +218,14 @@ class GranularProcessor extends AudioWorkletProcessor {
           break;
         }
         case "envHold":
-          this.env1.triggerHold();
+          this.env1.setHold(true);
+          break;
+        case "envAttack":
+          this.env1.setHold(false);
+          this.env1.reset();
           break;
         case "envRelease":
-          this.env1.triggerRelease();
-          break;
-        case "envReset":
-          this.env1.stage = ENV_IDLE;
-          this.env1.phasePos = 0;
-          this.env1.level = 0;
-          this.env1.hold = false;
+          this.env1.release();
           break;
       }
     };
