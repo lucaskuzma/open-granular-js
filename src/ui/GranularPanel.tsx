@@ -94,7 +94,7 @@ function Section({
 }) {
   return (
     <div>
-      <div style={{ fontSize: 11, color: "#666", marginBottom: 4, userSelect: "none" }}>
+      <div style={{ fontSize: 11, color: "#888", marginBottom: 4, userSelect: "none" }}>
         {title}
       </div>
       <div style={{ display: "flex", gap: 16 }}>{children}</div>

@@ -77,8 +77,8 @@ export default function App() {
   return (
     <div
       style={{
-        backgroundColor: "#0a0a0a",
-        color: "#eee",
+        backgroundColor: "#fff",
+        color: "#000",
         minHeight: "100vh",
         fontFamily: "system-ui, sans-serif",
       }}
@@ -90,7 +90,7 @@ export default function App() {
           alignItems: "center",
           gap: 16,
           padding: "8px 16px",
-          borderBottom: "1px solid #222",
+          borderBottom: "1px solid #ddd",
         }}
       >
         <span style={{ fontWeight: 600, fontSize: 16 }}>Open Granular</span>
@@ -114,7 +114,7 @@ export default function App() {
           }}
         />
 
-        <span style={{ fontSize: 12, color: "#888" }}>{status}</span>
+        <span style={{ fontSize: 12, color: "#666" }}>{status}</span>
       </div>
 
       {/* Synth panel */}
@@ -125,9 +125,9 @@ export default function App() {
 
 const buttonStyle: React.CSSProperties = {
   padding: "4px 16px",
-  backgroundColor: "#222",
-  color: "#eee",
-  border: "1px solid #444",
+  backgroundColor: "#f0f0f0",
+  color: "#000",
+  border: "1px solid #ccc",
   borderRadius: 4,
   cursor: "pointer",
   fontSize: 13,

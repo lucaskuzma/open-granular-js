@@ -68,7 +68,7 @@ export function PositionControl({
         touchAction: "none",
         overflow: "hidden",
         borderRadius: 4,
-        border: "1px solid rgba(255,255,255,0.12)",
+        border: "1px solid rgba(0,0,0,0.1)",
       }}
     >
       <WaveformView buffer={buffer} width={width} height={height} />
@@ -82,7 +82,7 @@ export function PositionControl({
           bottom: 0,
           width: 2,
           marginLeft: -1,
-          backgroundColor: "rgba(255,255,255,0.7)",
+          backgroundColor: "rgba(0,0,0,0.7)",
           pointerEvents: "none",
         }}
       />
@@ -95,7 +95,7 @@ export function PositionControl({
           top: 0,
           bottom: 0,
           width: jitterWidth,
-          backgroundColor: "rgba(255,255,255,0.08)",
+          backgroundColor: "rgba(0,0,0,0.08)",
           pointerEvents: "none",
         }}
       />

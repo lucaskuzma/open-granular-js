@@ -20,11 +20,11 @@ export function WaveformView({ buffer, width, height }: WaveformViewProps) {
     canvas.height = height * dpr;
     ctx.scale(dpr, dpr);
 
-    ctx.fillStyle = "#111";
+    ctx.fillStyle = "#fff";
     ctx.fillRect(0, 0, width, height);
 
     if (!buffer) {
-      ctx.fillStyle = "#444";
+      ctx.fillStyle = "#999";
       ctx.font = "12px sans-serif";
       ctx.textAlign = "center";
       ctx.fillText("No audio loaded", width / 2, height / 2);
@@ -35,7 +35,7 @@ export function WaveformView({ buffer, width, height }: WaveformViewProps) {
     const step = Math.max(1, Math.floor(data.length / width));
     const mid = height / 2;
 
-    ctx.strokeStyle = "#5a8";
+    ctx.strokeStyle = "#000";
     ctx.lineWidth = 1;
     ctx.beginPath();
 

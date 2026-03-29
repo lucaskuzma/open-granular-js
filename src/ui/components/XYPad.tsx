@@ -53,7 +53,7 @@ export function XYPad({ store, xKey, yKey, label, size = 96 }: XYPadProps) {
           borderRadius: 4,
           touchAction: "none",
           cursor: "crosshair",
-          border: "1px solid rgba(255,255,255,0.12)",
+          border: "1px solid rgba(0,0,0,0.1)",
         }}
       >
         {/* Crosshair indicator */}
@@ -67,12 +67,12 @@ export function XYPad({ store, xKey, yKey, label, size = 96 }: XYPadProps) {
             marginLeft: -4,
             marginBottom: -4,
             borderRadius: "50%",
-            backgroundColor: "rgba(255,255,255,0.8)",
+            backgroundColor: "rgba(0,0,0,0.6)",
             pointerEvents: "none",
           }}
         />
       </div>
-      <span style={{ fontSize: 11, color: "#aaa", userSelect: "none" }}>{label}</span>
+      <span style={{ fontSize: 11, color: "#666", userSelect: "none" }}>{label}</span>
     </div>
   );
 }

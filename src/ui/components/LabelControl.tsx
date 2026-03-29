@@ -50,10 +50,10 @@ export function LabelControl({ store, paramKey, label, width = 32 }: LabelContro
         gap: 2,
       }}
     >
-      <span style={{ fontFamily: "monospace", fontSize: 16, color: "#fff" }}>
+      <span style={{ fontFamily: "monospace", fontSize: 16, color: "#000" }}>
         {display}
       </span>
-      <span style={{ fontSize: 9, color: "#888" }}>{label}</span>
+      <span style={{ fontSize: 9, color: "#666" }}>{label}</span>
     </div>
   );
 }
