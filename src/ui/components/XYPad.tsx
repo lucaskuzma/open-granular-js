@@ -15,6 +15,8 @@ export function XYPad({ store, xKey, yKey, label, size = 96 }: XYPadProps) {
   const ref = useRef<HTMLDivElement>(null);
   const x = useParam(store, xKey);
   const y = yKey ? useParam(store, yKey) : 0.5;
+  const singleAxis = !yKey;
+  const height = singleAxis ? Math.round(size / 4) : size;
 
   const update = useCallback(
     (e: RPointerEvent) => {
@@ -22,9 +24,11 @@ export function XYPad({ store, xKey, yKey, label, size = 96 }: XYPadProps) {
       if (!el) return;
       const rect = el.getBoundingClientRect();
       const nx = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-      const ny = Math.max(0, Math.min(1, 1 - (e.clientY - rect.top) / rect.height));
       store.set(xKey, nx);
-      if (yKey) store.set(yKey, ny);
+      if (yKey) {
+        const ny = Math.max(0, Math.min(1, 1 - (e.clientY - rect.top) / rect.height));
+        store.set(yKey, ny);
+      }
     },
     [store, xKey, yKey],
   );
@@ -47,21 +51,20 @@ export function XYPad({ store, xKey, yKey, label, size = 96 }: XYPadProps) {
         }}
         style={{
           width: size,
-          height: size,
+          height,
           backgroundColor: colorFor(x, y),
           position: "relative",
           borderRadius: 4,
           touchAction: "none",
-          cursor: "crosshair",
+          cursor: singleAxis ? "ew-resize" : "crosshair",
           border: "1px solid rgba(0,0,0,0.1)",
         }}
       >
-        {/* Crosshair indicator */}
         <div
           style={{
             position: "absolute",
             left: `${x * 100}%`,
-            bottom: `${y * 100}%`,
+            bottom: singleAxis ? "50%" : `${y * 100}%`,
             width: 8,
             height: 8,
             marginLeft: -4,
