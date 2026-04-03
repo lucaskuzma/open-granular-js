@@ -67,6 +67,13 @@ export class ParamStore {
     return () => subs.delete(cb);
   }
 
+  /** Return a plain snapshot of all current values. */
+  snapshot(): Record<string, number> {
+    const out: Record<string, number> = {};
+    for (const [key, value] of this.values) out[key] = value;
+    return out;
+  }
+
   /** Batch-subscribe to all param changes. */
   subscribeAll(cb: (key: string, value: number) => void): () => void {
     const unsubs: (() => void)[] = [];

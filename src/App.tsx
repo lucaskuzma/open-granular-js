@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { AudioManager } from "./audio/AudioManager";
 import {
   DEFAULT_AUDIO_URL,
@@ -7,11 +7,13 @@ import {
 } from "./audio/BufferLoader";
 import { ParamStore } from "./engine/ParamStore";
 import { GranularEngine } from "./engine/granular/GranularEngine";
+import { SlotManager, SLOT_KEYS } from "./control/SlotManager";
 import { GranularPanel } from "./ui/GranularPanel";
 
 const audioManager = new AudioManager();
 const paramStore = new ParamStore();
 const granularEngine = new GranularEngine();
+const slotManager = new SlotManager(paramStore);
 
 paramStore.load(granularEngine.paramDefs);
 
@@ -74,6 +76,35 @@ export default function App() {
     [running],
   );
 
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement).tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+
+      const key = e.key.toLowerCase();
+
+      // Division keys 1-6
+      const div = parseInt(key, 10);
+      if (div >= 1 && div <= 6) {
+        slotManager.setDivision(div);
+        return;
+      }
+
+      // Slot keys
+      const slotIndex = (SLOT_KEYS as readonly string[]).indexOf(key);
+      if (slotIndex === -1) return;
+
+      if (e.shiftKey) {
+        slotManager.save(slotIndex);
+      } else {
+        slotManager.recall(slotIndex);
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+
   return (
     <div
       style={{
@@ -118,7 +149,7 @@ export default function App() {
       </div>
 
       {/* Synth panel */}
-      <GranularPanel store={paramStore} engine={granularEngine} buffer={buffer} />
+      <GranularPanel store={paramStore} engine={granularEngine} buffer={buffer} slotManager={slotManager} />
     </div>
   );
 }

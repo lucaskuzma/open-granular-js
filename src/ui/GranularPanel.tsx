@@ -1,18 +1,21 @@
 import type { ParamStore } from "../engine/ParamStore";
 import type { SynthEngine } from "../engine/types";
+import type { SlotManager } from "../control/SlotManager";
 import { XYPad } from "./components/XYPad";
 import { LabelControl } from "./components/LabelControl";
 import { PositionControl } from "./components/PositionControl";
+import { SlotRow } from "./components/SlotRow";
 
 interface GranularPanelProps {
   store: ParamStore;
   engine: SynthEngine | null;
   buffer: AudioBuffer | null;
+  slotManager: SlotManager;
 }
 
 const PAD_SIZE = 96;
 
-export function GranularPanel({ store, engine, buffer }: GranularPanelProps) {
+export function GranularPanel({ store, engine, buffer, slotManager }: GranularPanelProps) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16, padding: 16 }}>
       {/* Waveform + position scrubber */}
@@ -44,6 +47,9 @@ export function GranularPanel({ store, engine, buffer }: GranularPanelProps) {
         <XYPad store={store} xKey="env1Release" label="release" size={PAD_SIZE} />
         <XYPad store={store} xKey="volume" label="volume" size={PAD_SIZE} />
       </div>
+
+      {/* Slot row */}
+      <SlotRow slotManager={slotManager} />
     </div>
   );
 }
