@@ -28,19 +28,14 @@ export function SlotRow({ slotManager }: SlotRowProps) {
   const active = slotManager.currentActiveSlot;
 
   return (
-    <div style={{ display: "flex", gap: 16, alignItems: "flex-end" }}>
-      {/* BPM / note display */}
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2, minWidth: 48 }}>
-        <span style={{ fontSize: 11, color: "#666", fontVariantNumeric: "tabular-nums" }}>
-          {slotManager.bpm} bpm
-        </span>
-        <span style={{ fontSize: 13, fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>
-          {slotManager.divisionLabel}
-        </span>
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      <div style={{ display: "flex", gap: 8, fontSize: 11, color: "#666", fontVariantNumeric: "tabular-nums" }}>
+        <span>{slotManager.bpm} bpm</span>
+        <span style={{ fontWeight: 600, color: "#000" }}>{slotManager.divisionLabel}</span>
       </div>
 
-      {/* Slots */}
-      {SLOT_KEYS.map((letter, i) => {
+      <div style={{ display: "flex", gap: 16, alignItems: "flex-end" }}>
+        {SLOT_KEYS.map((letter, i) => {
         const data = slotManager.slots[i] ?? null;
         const isActive = i === active;
         return (
@@ -74,6 +69,7 @@ export function SlotRow({ slotManager }: SlotRowProps) {
           </div>
         );
       })}
+      </div>
     </div>
   );
 }
