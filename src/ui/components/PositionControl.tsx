@@ -46,10 +46,11 @@ export function PositionControl({
   const onPointerDown = useCallback(
     (e: RPointerEvent) => {
       (e.target as HTMLElement).setPointerCapture(e.pointerId);
+      slotManager.excludeFromInterp("position", "positionJitter");
       update(e);
       engine?.sendCommand("envAttack");
     },
-    [update, engine],
+    [update, engine, slotManager],
   );
 
   const onPointerUp = useCallback(() => {

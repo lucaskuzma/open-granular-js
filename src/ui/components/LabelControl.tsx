@@ -7,9 +7,10 @@ interface LabelControlProps {
   paramKey: string;
   label: string;
   width?: number;
+  onDragStart?: () => void;
 }
 
-export function LabelControl({ store, paramKey, label, width = 32 }: LabelControlProps) {
+export function LabelControl({ store, paramKey, label, width = 32, onDragStart }: LabelControlProps) {
   const value = useParam(store, paramKey);
   const startY = useRef(0);
   const startVal = useRef(0);
@@ -19,8 +20,9 @@ export function LabelControl({ store, paramKey, label, width = 32 }: LabelContro
       (e.target as HTMLElement).setPointerCapture(e.pointerId);
       startY.current = e.clientY;
       startVal.current = store.get(paramKey);
+      onDragStart?.();
     },
-    [store, paramKey],
+    [store, paramKey, onDragStart],
   );
 
   const onPointerMove = useCallback(

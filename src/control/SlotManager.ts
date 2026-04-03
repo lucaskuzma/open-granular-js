@@ -19,6 +19,7 @@ export class SlotManager {
   private interpDuration = 0;
   private rafId = 0;
   private activeSlot = -1;
+  private excludedKeys = new Set<string>();
 
   private listeners = new Set<SlotListener>();
 
@@ -57,12 +58,17 @@ export class SlotManager {
     this.notify();
   }
 
+  excludeFromInterp(...keys: string[]) {
+    for (const k of keys) this.excludedKeys.add(k);
+  }
+
   recall(index: number) {
     if (index < 0 || index >= SLOT_KEYS.length) return;
     const target = this.slots[index];
     if (!target) return;
 
     this.cancelInterp();
+    this.excludedKeys.clear();
 
     this.interpStart = this.store.snapshot();
     this.interpTarget = target;
@@ -92,6 +98,7 @@ export class SlotManager {
     const t = Math.min(1, elapsed / this.interpDuration);
 
     for (const key of Object.keys(this.interpTarget)) {
+      if (this.excludedKeys.has(key)) continue;
       const a = this.interpStart[key] ?? 0;
       const b = this.interpTarget[key] ?? 0;
       this.store.set(key, a + (b - a) * t);
