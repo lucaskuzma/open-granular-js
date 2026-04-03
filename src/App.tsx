@@ -83,9 +83,8 @@ export default function App() {
 
       const key = e.key.toLowerCase();
 
-      // Division keys 1-6
       const div = parseInt(key, 10);
-      if (div >= 1 && div <= 6) {
+      if (div >= 1 && div <= 9) {
         slotManager.setDivision(div);
         return;
       }

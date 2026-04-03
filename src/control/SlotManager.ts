@@ -10,7 +10,7 @@ type SlotListener = () => void;
 
 export class SlotManager {
   readonly slots: (SlotData | null)[] = new Array(SLOT_KEYS.length).fill(null);
-  private division = 3; // default: quarter note
+  private division = 4; // default: 1 bar
   private store: ParamStore;
 
   private interpStart: Record<string, number> | null = null;
@@ -38,14 +38,15 @@ export class SlotManager {
     return this.activeSlot;
   }
 
-  /** Duration label for the current division (e.g. "1/4"). */
+  /** Duration label: 8, 4, 2, 1, 1/2, 1/4 bars. */
   get divisionLabel(): string {
-    const denom = Math.pow(2, this.division - 1);
-    return denom === 1 ? "1" : `1/${denom}`;
+    const bars = 8 / Math.pow(2, this.division - 1);
+    if (bars >= 1) return `${bars}`;
+    return `1/${1 / bars}`;
   }
 
   setDivision(n: number) {
-    if (n < 1 || n > 6) return;
+    if (n < 1 || n > 9) return;
     this.division = n;
     this.notify();
   }
@@ -66,7 +67,7 @@ export class SlotManager {
     this.interpStart = this.store.snapshot();
     this.interpTarget = target;
     this.interpDuration =
-      WHOLE_NOTE_S / Math.pow(2, this.division - 1);
+      WHOLE_NOTE_S * Math.pow(2, 4 - this.division);
     this.interpStartTime = performance.now() / 1000;
     this.activeSlot = index;
     this.notify();
