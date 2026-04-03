@@ -1,6 +1,8 @@
-import { useRef, useCallback, type PointerEvent as RPointerEvent } from "react";
+import { useRef, useCallback, useEffect, useState } from "react";
+import type { PointerEvent as RPointerEvent } from "react";
 import type { ParamStore } from "../../engine/ParamStore";
 import type { SynthEngine } from "../../engine/types";
+import { SlotManager, SLOT_KEYS } from "../../control/SlotManager";
 import { useParam } from "../hooks";
 import { WaveformView } from "./WaveformView";
 
@@ -8,6 +10,7 @@ interface PositionControlProps {
   store: ParamStore;
   engine: SynthEngine | null;
   buffer: AudioBuffer | null;
+  slotManager: SlotManager;
   width: number;
   height?: number;
 }
@@ -16,12 +19,16 @@ export function PositionControl({
   store,
   engine,
   buffer,
+  slotManager,
   width,
   height = 96,
 }: PositionControlProps) {
   const ref = useRef<HTMLDivElement>(null);
   const position = useParam(store, "position");
   const positionJitter = useParam(store, "positionJitter");
+
+  const [, setTick] = useState(0);
+  useEffect(() => slotManager.subscribe(() => setTick((n) => n + 1)), [slotManager]);
 
   const update = useCallback(
     (e: RPointerEvent) => {
@@ -52,6 +59,7 @@ export function PositionControl({
   const jitterWidth = positionJitter * width * 0.25;
 
   return (
+    <>
     <div
       ref={ref}
       onPointerDown={onPointerDown}
@@ -100,5 +108,31 @@ export function PositionControl({
         }}
       />
     </div>
+
+    {/* Slot position markers */}
+    <div style={{ position: "relative", width, height: 16 }}>
+      {SLOT_KEYS.map((letter, i) => {
+        const data = slotManager.slots[i];
+        if (!data) return null;
+        const pos = data.position ?? 0;
+        return (
+          <span
+            key={letter}
+            style={{
+              position: "absolute",
+              left: `${pos * 100}%`,
+              transform: "translateX(-50%)",
+              fontSize: 11,
+              fontWeight: 600,
+              color: "#999",
+              userSelect: "none",
+            }}
+          >
+            {letter}
+          </span>
+        );
+      })}
+    </div>
+    </>
   );
 }

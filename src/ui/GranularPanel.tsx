@@ -23,6 +23,7 @@ export function GranularPanel({ store, engine, buffer, slotManager }: GranularPa
         store={store}
         engine={engine}
         buffer={buffer}
+        slotManager={slotManager}
         width={4 * PAD_SIZE + 3 * 48}
       />
 
