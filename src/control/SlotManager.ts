@@ -58,6 +58,17 @@ export class SlotManager {
     this.notify();
   }
 
+  /** True if the key is actively being interpolated (has a target and isn't excluded). */
+  isInterpolating(key: string): boolean {
+    return this.interpTarget != null && !this.excludedKeys.has(key) && key in this.interpTarget;
+  }
+
+  /** Returns the target value for a key if it's being interpolated. */
+  getTarget(key: string): number | undefined {
+    if (!this.interpTarget || this.excludedKeys.has(key)) return undefined;
+    return this.interpTarget[key];
+  }
+
   excludeFromInterp(...keys: string[]) {
     for (const k of keys) this.excludedKeys.add(k);
   }

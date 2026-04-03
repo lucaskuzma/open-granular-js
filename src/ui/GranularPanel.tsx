@@ -37,16 +37,16 @@ export function GranularPanel({ store, engine, buffer, slotManager }: GranularPa
 
       {/* Single-axis pads and controls */}
       <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "flex-start" }}>
-        <XYPad store={store} xKey="density" label="density" size={PAD_SIZE} onDragStart={() => slotManager.excludeFromInterp("density")} />
-        <XYPad store={store} xKey="ramp" label="ramp" size={PAD_SIZE} onDragStart={() => slotManager.excludeFromInterp("ramp")} />
-        <XYPad store={store} xKey="lfo1Period" label="lfo1 rate" size={PAD_SIZE} onDragStart={() => slotManager.excludeFromInterp("lfo1Period")} />
-        <XYPad store={store} xKey="lfo2Period" label="lfo2 rate" size={PAD_SIZE} onDragStart={() => slotManager.excludeFromInterp("lfo2Period")} />
+        <XYPad store={store} slotManager={slotManager} xKey="density" label="density" size={PAD_SIZE} onDragStart={() => slotManager.excludeFromInterp("density")} />
+        <XYPad store={store} slotManager={slotManager} xKey="ramp" label="ramp" size={PAD_SIZE} onDragStart={() => slotManager.excludeFromInterp("ramp")} />
+        <XYPad store={store} slotManager={slotManager} xKey="lfo1Period" label="lfo1 rate" size={PAD_SIZE} onDragStart={() => slotManager.excludeFromInterp("lfo1Period")} />
+        <XYPad store={store} slotManager={slotManager} xKey="lfo2Period" label="lfo2 rate" size={PAD_SIZE} onDragStart={() => slotManager.excludeFromInterp("lfo2Period")} />
       </div>
 
       <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "flex-start" }}>
-        <XYPad store={store} xKey="env1Attack" label="attack" size={PAD_SIZE} onDragStart={() => slotManager.excludeFromInterp("env1Attack")} />
-        <XYPad store={store} xKey="env1Release" label="release" size={PAD_SIZE} onDragStart={() => slotManager.excludeFromInterp("env1Release")} />
-        <XYPad store={store} xKey="volume" label="volume" size={PAD_SIZE} onDragStart={() => slotManager.excludeFromInterp("volume")} />
+        <XYPad store={store} slotManager={slotManager} xKey="env1Attack" label="attack" size={PAD_SIZE} onDragStart={() => slotManager.excludeFromInterp("env1Attack")} />
+        <XYPad store={store} slotManager={slotManager} xKey="env1Release" label="release" size={PAD_SIZE} onDragStart={() => slotManager.excludeFromInterp("env1Release")} />
+        <XYPad store={store} slotManager={slotManager} xKey="volume" label="volume" size={PAD_SIZE} onDragStart={() => slotManager.excludeFromInterp("volume")} />
       </div>
 
       {/* Slot row */}
@@ -79,7 +79,7 @@ function PadWithMods({
 }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-      <XYPad store={store} xKey={xKey} yKey={yKey} label={label} size={PAD_SIZE} onDragStart={() => { slotManager.excludeFromInterp(xKey, yKey); onDragStart?.(); }} />
+      <XYPad store={store} slotManager={slotManager} xKey={xKey} yKey={yKey} label={label} size={PAD_SIZE} onDragStart={() => { slotManager.excludeFromInterp(xKey, yKey); onDragStart?.(); }} />
       <div style={{ display: "flex", gap: 4 }}>
         <LabelControl store={store} paramKey={envKey} label="env" onDragStart={() => slotManager.excludeFromInterp(envKey)} />
         <LabelControl store={store} paramKey={lfo1Key} label="lfo1" onDragStart={() => slotManager.excludeFromInterp(lfo1Key)} />
