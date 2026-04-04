@@ -4,7 +4,7 @@ import type { ParamStore } from "../../engine/ParamStore";
 import type { SynthEngine } from "../../engine/types";
 import { SlotManager, SLOT_KEYS } from "../../control/SlotManager";
 import { useParam } from "../hooks";
-import { WaveformView } from "./WaveformView";
+import { SpectrumView } from "./SpectrumView";
 
 interface PositionControlProps {
   store: ParamStore;
@@ -80,7 +80,7 @@ export function PositionControl({
         border: "1px solid rgba(0,0,0,0.1)",
       }}
     >
-      <WaveformView buffer={buffer} width={width} height={height} />
+      <SpectrumView buffer={buffer} width={width} height={height} />
 
       {/* Position indicator */}
       <div
