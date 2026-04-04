@@ -40,4 +40,15 @@ export const GRANULAR_PARAMS: ParamDefinition[] = [
   { key: "env1Size",     label: "Env Size",      min: 0, max: 1, default: 0 },
   { key: "env1Spread",   label: "Env Spread",    min: 0, max: 1, default: 0 },
   { key: "env1Pitch",    label: "Env Pitch",     min: 0, max: 1, default: 0 },
+
+  // --- Harmonic drawbars (probability weights, Hammond order, 7th harmonic skipped) ---
+  { key: "drawbar1", label: "16'",    min: 0, max: 1, default: 0 },
+  { key: "drawbar2", label: "5⅓'",   min: 0, max: 1, default: 0 },
+  { key: "drawbar3", label: "8'",     min: 0, max: 1, default: 1 },
+  { key: "drawbar4", label: "4'",     min: 0, max: 1, default: 0 },
+  { key: "drawbar5", label: "2⅔'",   min: 0, max: 1, default: 0 },
+  { key: "drawbar6", label: "2'",     min: 0, max: 1, default: 0 },
+  { key: "drawbar7", label: "1⅗'",   min: 0, max: 1, default: 0 },
+  { key: "drawbar8", label: "1⅓'",   min: 0, max: 1, default: 0 },
+  { key: "drawbar9", label: "1'",     min: 0, max: 1, default: 0 },
 ];

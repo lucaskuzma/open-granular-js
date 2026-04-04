@@ -10,16 +10,19 @@ interface XYPadProps {
   yKey?: string;
   label: string;
   size?: number;
+  vertical?: boolean;
   onDragStart?: () => void;
   slotManager?: SlotManager;
 }
 
-export function XYPad({ store, xKey, yKey, label, size = 96, onDragStart, slotManager }: XYPadProps) {
+export function XYPad({ store, xKey, yKey, label, size = 96, vertical, onDragStart, slotManager }: XYPadProps) {
   const ref = useRef<HTMLDivElement>(null);
   const x = useParam(store, xKey);
   const y = yKey ? useParam(store, yKey) : 0.5;
   const singleAxis = !yKey;
-  const height = singleAxis ? Math.round(size / 4) : size;
+
+  const padWidth = vertical ? Math.round(size / 4) : size;
+  const padHeight = vertical ? size : singleAxis ? Math.round(size / 4) : size;
 
   const lerping = slotManager?.isInterpolating(xKey) ?? false;
   const targetX = slotManager?.getTarget(xKey);
@@ -31,14 +34,19 @@ export function XYPad({ store, xKey, yKey, label, size = 96, onDragStart, slotMa
       const el = ref.current;
       if (!el) return;
       const rect = el.getBoundingClientRect();
-      const nx = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-      store.set(xKey, nx);
-      if (yKey) {
+      if (vertical) {
         const ny = Math.max(0, Math.min(1, 1 - (e.clientY - rect.top) / rect.height));
-        store.set(yKey, ny);
+        store.set(xKey, ny);
+      } else {
+        const nx = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+        store.set(xKey, nx);
+        if (yKey) {
+          const ny = Math.max(0, Math.min(1, 1 - (e.clientY - rect.top) / rect.height));
+          store.set(yKey, ny);
+        }
       }
     },
-    [store, xKey, yKey],
+    [store, xKey, yKey, vertical],
   );
 
   const onPointerDown = useCallback(
@@ -50,6 +58,9 @@ export function XYPad({ store, xKey, yKey, label, size = 96, onDragStart, slotMa
     [update, onDragStart],
   );
 
+  const dotLeft = vertical ? "50%" : `${x * 100}%`;
+  const dotBottom = vertical ? `${x * 100}%` : singleAxis ? "50%" : `${y * 100}%`;
+
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
       <div
@@ -59,22 +70,21 @@ export function XYPad({ store, xKey, yKey, label, size = 96, onDragStart, slotMa
           if (e.buttons > 0) update(e);
         }}
         style={{
-          width: size,
-          height,
-          backgroundColor: colorFor(x, y),
+          width: padWidth,
+          height: padHeight,
+          backgroundColor: colorFor(vertical ? 0.5 : x, vertical ? x : y),
           position: "relative",
           borderRadius: 4,
           touchAction: "none",
-          cursor: singleAxis ? "ew-resize" : "crosshair",
+          cursor: vertical ? "ns-resize" : singleAxis ? "ew-resize" : "crosshair",
           border: "1px solid rgba(0,0,0,0.1)",
         }}
       >
-        {/* Current position dot */}
         <div
           style={{
             position: "absolute",
-            left: `${x * 100}%`,
-            bottom: singleAxis ? "50%" : `${y * 100}%`,
+            left: dotLeft,
+            bottom: dotBottom,
             width: 8,
             height: 8,
             marginLeft: -4,
@@ -86,13 +96,12 @@ export function XYPad({ store, xKey, yKey, label, size = 96, onDragStart, slotMa
           }}
         />
 
-        {/* Target circle (visible only during lerp) */}
         {lerping && targetX != null && (
           <div
             style={{
               position: "absolute",
-              left: `${targetX * 100}%`,
-              bottom: singleAxis ? "50%" : `${(targetY ?? 0.5) * 100}%`,
+              left: vertical ? "50%" : `${targetX * 100}%`,
+              bottom: vertical ? `${targetX * 100}%` : singleAxis ? "50%" : `${(targetY ?? 0.5) * 100}%`,
               width: 8,
               height: 8,
               marginLeft: -4,
