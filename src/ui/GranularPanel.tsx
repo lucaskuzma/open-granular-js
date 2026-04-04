@@ -5,7 +5,9 @@ import { XYPad } from "./components/XYPad";
 import { HarmonicsPad } from "./components/HarmonicsPad";
 import { LabelControl } from "./components/LabelControl";
 import { PositionControl } from "./components/PositionControl";
+import { TogglePad } from "./components/TogglePad";
 import { SlotRow } from "./components/SlotRow";
+import { useParam } from "./hooks";
 
 interface GranularPanelProps {
   store: ParamStore;
@@ -17,6 +19,8 @@ interface GranularPanelProps {
 const PAD_SIZE = 96;
 
 export function GranularPanel({ store, engine, buffer, slotManager }: GranularPanelProps) {
+  const hold = useParam(store, "hold") >= 0.5;
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16, padding: 16 }}>
       {/* Waveform + position scrubber */}
@@ -30,7 +34,7 @@ export function GranularPanel({ store, engine, buffer, slotManager }: GranularPa
 
       {/* Main XY pads with modulation depths underneath */}
       <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
-        <PadWithMods store={store} slotManager={slotManager} xKey="position" yKey="positionJitter" envKey="env1Position" lfo1Key="lfo1Position" lfo2Key="lfo2Position" label="position" onDragStart={() => engine?.sendCommand("envHold")} />
+        <PadWithMods store={store} slotManager={slotManager} xKey="position" yKey="positionJitter" envKey="env1Position" lfo1Key="lfo1Position" lfo2Key="lfo2Position" label="position" />
         <PadWithMods store={store} slotManager={slotManager} xKey="size" yKey="sizeJitter" envKey="env1Size" lfo1Key="lfo1Size" lfo2Key="lfo2Size" label="size" />
         <PadWithMods store={store} slotManager={slotManager} xKey="spread" yKey="spreadJitter" envKey="env1Spread" lfo1Key="lfo1Spread" lfo2Key="lfo2Spread" label="spread" />
         <PadWithMods store={store} slotManager={slotManager} xKey="pitch" yKey="pitchJitter" envKey="env1Pitch" lfo1Key="lfo1Pitch" lfo2Key="lfo2Pitch" label="pitch" />
@@ -61,8 +65,9 @@ export function GranularPanel({ store, engine, buffer, slotManager }: GranularPa
       </div>
 
       <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "flex-start" }}>
-        <XYPad store={store} slotManager={slotManager} xKey="env1Attack" label="attack" size={PAD_SIZE} onDragStart={() => slotManager.excludeFromInterp("env1Attack")} />
-        <XYPad store={store} slotManager={slotManager} xKey="env1Release" label="release" size={PAD_SIZE} onDragStart={() => slotManager.excludeFromInterp("env1Release")} />
+        <XYPad store={store} slotManager={slotManager} xKey="env1Attack" label="attack" size={PAD_SIZE} disabled={hold} onDragStart={() => slotManager.excludeFromInterp("env1Attack")} />
+        <XYPad store={store} slotManager={slotManager} xKey="env1Release" label="release" size={PAD_SIZE} disabled={hold} onDragStart={() => slotManager.excludeFromInterp("env1Release")} />
+        <TogglePad store={store} paramKey="hold" label="hold" />
         <XYPad store={store} slotManager={slotManager} xKey="volume" label="volume" size={PAD_SIZE} onDragStart={() => slotManager.excludeFromInterp("volume")} />
       </div>
 

@@ -2,7 +2,7 @@ import { useRef, useCallback, type PointerEvent as RPointerEvent } from "react";
 import type { ParamStore } from "../../engine/ParamStore";
 import type { SlotManager } from "../../control/SlotManager";
 import { useParam } from "../hooks";
-import { colorFor } from "../colors";
+import { colorFor, DISABLED } from "../colors";
 
 interface XYPadProps {
   store: ParamStore;
@@ -11,11 +11,12 @@ interface XYPadProps {
   label: string;
   size?: number;
   vertical?: boolean;
+  disabled?: boolean;
   onDragStart?: () => void;
   slotManager?: SlotManager;
 }
 
-export function XYPad({ store, xKey, yKey, label, size = 96, vertical, onDragStart, slotManager }: XYPadProps) {
+export function XYPad({ store, xKey, yKey, label, size = 96, vertical, disabled, onDragStart, slotManager }: XYPadProps) {
   const ref = useRef<HTMLDivElement>(null);
   const x = useParam(store, xKey);
   const y = yKey ? useParam(store, yKey) : 0.5;
@@ -51,11 +52,12 @@ export function XYPad({ store, xKey, yKey, label, size = 96, vertical, onDragSta
 
   const onPointerDown = useCallback(
     (e: RPointerEvent) => {
+      if (disabled) return;
       (e.target as HTMLElement).setPointerCapture(e.pointerId);
       update(e);
       onDragStart?.();
     },
-    [update, onDragStart],
+    [update, onDragStart, disabled],
   );
 
   const dotLeft = vertical ? "50%" : `${x * 100}%`;
@@ -67,16 +69,16 @@ export function XYPad({ store, xKey, yKey, label, size = 96, vertical, onDragSta
         ref={ref}
         onPointerDown={onPointerDown}
         onPointerMove={(e) => {
-          if (e.buttons > 0) update(e);
+          if (!disabled && e.buttons > 0) update(e);
         }}
         style={{
           width: padWidth,
           height: padHeight,
-          backgroundColor: colorFor(vertical ? 0.5 : x, vertical ? x : y),
+          backgroundColor: disabled ? DISABLED : colorFor(vertical ? 0.5 : x, vertical ? x : y),
           position: "relative",
           borderRadius: 4,
           touchAction: "none",
-          cursor: vertical ? "ns-resize" : singleAxis ? "ew-resize" : "crosshair",
+          cursor: disabled ? "default" : vertical ? "ns-resize" : singleAxis ? "ew-resize" : "crosshair",
           border: "1px solid rgba(0,0,0,0.1)",
         }}
       >

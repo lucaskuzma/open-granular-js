@@ -33,9 +33,10 @@ export const GRANULAR_PARAMS: ParamDefinition[] = [
   { key: "lfo2Spread",   label: "LFO2 Spread",   min: 0, max: 1, default: 0 },
   { key: "lfo2Pitch",    label: "LFO2 Pitch",    min: 0, max: 1, default: 0 },
 
-  // --- Envelope mod depths ---
+  // --- Envelope ---
   { key: "env1Attack",   label: "Env Attack",    min: 0, max: 1, default: 0.25 },
   { key: "env1Release",  label: "Env Release",   min: 0, max: 1, default: 0.25 },
+  { key: "hold",         label: "Hold",          min: 0, max: 1, default: 1    },
   { key: "env1Position", label: "Env Pos",       min: 0, max: 1, default: 0 },
   { key: "env1Size",     label: "Env Size",      min: 0, max: 1, default: 0 },
   { key: "env1Spread",   label: "Env Spread",    min: 0, max: 1, default: 0 },

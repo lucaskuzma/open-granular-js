@@ -43,19 +43,21 @@ export function PositionControl({
     [store],
   );
 
+  const hold = useParam(store, "hold") >= 0.5;
+
   const onPointerDown = useCallback(
     (e: RPointerEvent) => {
       (e.target as HTMLElement).setPointerCapture(e.pointerId);
       slotManager.excludeFromInterp("position", "positionJitter");
       update(e);
-      engine?.sendCommand("envAttack");
+      if (!hold) engine?.sendCommand("envAttack");
     },
-    [update, engine, slotManager],
+    [update, engine, slotManager, hold],
   );
 
   const onPointerUp = useCallback(() => {
-    engine?.sendCommand("envRelease");
-  }, [engine]);
+    if (!hold) engine?.sendCommand("envRelease");
+  }, [engine, hold]);
 
   const jitterWidth = positionJitter * width * 0.25;
 

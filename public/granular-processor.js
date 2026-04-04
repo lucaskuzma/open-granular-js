@@ -193,6 +193,7 @@ class GranularProcessor extends AudioWorkletProcessor {
       { name: "env1Size",       defaultValue: 0,    minValue: 0,    maxValue: 1,    automationRate: "k-rate" },
       { name: "env1Spread",     defaultValue: 0,    minValue: 0,    maxValue: 1,    automationRate: "k-rate" },
       { name: "env1Pitch",      defaultValue: 0,    minValue: 0,    maxValue: 1,    automationRate: "k-rate" },
+      { name: "hold",           defaultValue: 1,    minValue: 0,    maxValue: 1,    automationRate: "k-rate" },
       { name: "drawbar1",      defaultValue: 0,    minValue: 0,    maxValue: 1,    automationRate: "k-rate" },
       { name: "drawbar2",      defaultValue: 0,    minValue: 0,    maxValue: 1,    automationRate: "k-rate" },
       { name: "drawbar3",      defaultValue: 1,    minValue: 0,    maxValue: 1,    automationRate: "k-rate" },
@@ -218,6 +219,7 @@ class GranularProcessor extends AudioWorkletProcessor {
     this.lfo1 = new LFO();
     this.lfo2 = new LFO();
     this.env1 = new ASREnvelope();
+    this.prevHold = 1;
 
     this.port.onmessage = (e) => {
       const { type } = e.data;
@@ -229,9 +231,6 @@ class GranularProcessor extends AudioWorkletProcessor {
           this.bufferLength = this.dataL.length;
           break;
         }
-        case "envHold":
-          this.env1.setHold(true);
-          break;
         case "envAttack":
           this.env1.setHold(false);
           this.env1.reset();
@@ -298,10 +297,22 @@ class GranularProcessor extends AudioWorkletProcessor {
     const env1Spread = this._p(parameters, "env1Spread");
     const env1Pitch = this._p(parameters, "env1Pitch");
 
+    const hold = this._p(parameters, "hold") >= 0.5 ? 1 : 0;
+
     this.lfo1.period = Math.max(MIN_LFO_PERIOD, Math.floor(lfo1Period * MAX_LFO_PERIOD));
     this.lfo2.period = Math.max(MIN_LFO_PERIOD, Math.floor(lfo2Period * MAX_LFO_PERIOD));
     this.env1.attackTime = Math.floor(env1Attack * MAX_ATTACK_TIME);
     this.env1.releaseTime = Math.floor(env1Release * MAX_RELEASE_TIME);
+
+    if (hold !== this.prevHold) {
+      if (hold) {
+        this.env1.setHold(true);
+      } else {
+        this.env1.setHold(false);
+        this.env1.release();
+      }
+      this.prevHold = hold;
+    }
 
     const bufLen = this.bufferLength;
     const maxGrainLength = Math.min(MAX_SIZE, bufLen);
