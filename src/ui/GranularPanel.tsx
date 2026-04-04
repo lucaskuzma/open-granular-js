@@ -2,6 +2,7 @@ import type { ParamStore } from "../engine/ParamStore";
 import type { SynthEngine } from "../engine/types";
 import type { SlotManager } from "../control/SlotManager";
 import { XYPad } from "./components/XYPad";
+import { HarmonicsPad } from "./components/HarmonicsPad";
 import { LabelControl } from "./components/LabelControl";
 import { PositionControl } from "./components/PositionControl";
 import { SlotRow } from "./components/SlotRow";
@@ -35,17 +36,20 @@ export function GranularPanel({ store, engine, buffer, slotManager }: GranularPa
         <PadWithMods store={store} slotManager={slotManager} xKey="pitch" yKey="pitchJitter" envKey="env1Pitch" lfo1Key="lfo1Pitch" lfo2Key="lfo2Pitch" label="pitch" />
       </div>
 
-      {/* Harmonic drawbars */}
-      <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
-        <XYPad store={store} slotManager={slotManager} xKey="drawbar1" label="16'" size={PAD_SIZE} vertical onDragStart={() => slotManager.excludeFromInterp("drawbar1")} />
-        <XYPad store={store} slotManager={slotManager} xKey="drawbar2" label="5⅓'" size={PAD_SIZE} vertical onDragStart={() => slotManager.excludeFromInterp("drawbar2")} />
-        <XYPad store={store} slotManager={slotManager} xKey="drawbar3" label="8'" size={PAD_SIZE} vertical onDragStart={() => slotManager.excludeFromInterp("drawbar3")} />
-        <XYPad store={store} slotManager={slotManager} xKey="drawbar4" label="4'" size={PAD_SIZE} vertical onDragStart={() => slotManager.excludeFromInterp("drawbar4")} />
-        <XYPad store={store} slotManager={slotManager} xKey="drawbar5" label="2⅔'" size={PAD_SIZE} vertical onDragStart={() => slotManager.excludeFromInterp("drawbar5")} />
-        <XYPad store={store} slotManager={slotManager} xKey="drawbar6" label="2'" size={PAD_SIZE} vertical onDragStart={() => slotManager.excludeFromInterp("drawbar6")} />
-        <XYPad store={store} slotManager={slotManager} xKey="drawbar7" label="1⅗'" size={PAD_SIZE} vertical onDragStart={() => slotManager.excludeFromInterp("drawbar7")} />
-        <XYPad store={store} slotManager={slotManager} xKey="drawbar8" label="1⅓'" size={PAD_SIZE} vertical onDragStart={() => slotManager.excludeFromInterp("drawbar8")} />
-        <XYPad store={store} slotManager={slotManager} xKey="drawbar9" label="1'" size={PAD_SIZE} vertical onDragStart={() => slotManager.excludeFromInterp("drawbar9")} />
+      {/* Harmonic drawbars + master harmonics fader */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 8, alignSelf: "flex-start" }}>
+        <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+          <XYPad store={store} slotManager={slotManager} xKey="drawbar1" label="16'" size={PAD_SIZE} vertical onDragStart={() => slotManager.excludeFromInterp("drawbar1")} />
+          <XYPad store={store} slotManager={slotManager} xKey="drawbar2" label="5⅓'" size={PAD_SIZE} vertical onDragStart={() => slotManager.excludeFromInterp("drawbar2")} />
+          <XYPad store={store} slotManager={slotManager} xKey="drawbar3" label="8'" size={PAD_SIZE} vertical onDragStart={() => slotManager.excludeFromInterp("drawbar3")} />
+          <XYPad store={store} slotManager={slotManager} xKey="drawbar4" label="4'" size={PAD_SIZE} vertical onDragStart={() => slotManager.excludeFromInterp("drawbar4")} />
+          <XYPad store={store} slotManager={slotManager} xKey="drawbar5" label="2⅔'" size={PAD_SIZE} vertical onDragStart={() => slotManager.excludeFromInterp("drawbar5")} />
+          <XYPad store={store} slotManager={slotManager} xKey="drawbar6" label="2'" size={PAD_SIZE} vertical onDragStart={() => slotManager.excludeFromInterp("drawbar6")} />
+          <XYPad store={store} slotManager={slotManager} xKey="drawbar7" label="1⅗'" size={PAD_SIZE} vertical onDragStart={() => slotManager.excludeFromInterp("drawbar7")} />
+          <XYPad store={store} slotManager={slotManager} xKey="drawbar8" label="1⅓'" size={PAD_SIZE} vertical onDragStart={() => slotManager.excludeFromInterp("drawbar8")} />
+          <XYPad store={store} slotManager={slotManager} xKey="drawbar9" label="1'" size={PAD_SIZE} vertical onDragStart={() => slotManager.excludeFromInterp("drawbar9")} />
+        </div>
+        <HarmonicsPad store={store} slotManager={slotManager} />
       </div>
 
       {/* Single-axis pads and controls */}
