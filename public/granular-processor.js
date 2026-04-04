@@ -4,7 +4,7 @@
 
 const MAX_GRAINS = 2000;
 const MAX_SIZE = 44100;
-const MAX_JITTER = 11025;
+const MAX_JITTER = 176400;
 const MAX_ATTACK_TIME = 88200;
 const MAX_RELEASE_TIME = 88200;
 const MIN_LFO_PERIOD = 441;
@@ -323,9 +323,9 @@ class GranularProcessor extends AudioWorkletProcessor {
     const maxRamp = Math.floor(baseLength / 2);
     const baseRamp = Math.floor(ramp * maxRamp);
     const basePitch = Math.pow(2, (pitch - 0.5) * 2);
-    const baseIndexJitter = positionJitter * MAX_JITTER;
-    const baseLengthJitter = sizeJitter * MAX_JITTER;
-    const baseDelayJitter = spreadJitter * MAX_JITTER;
+    const baseIndexJitter = positionJitter * positionJitter * MAX_JITTER;
+    const baseLengthJitter = sizeJitter * sizeJitter * MAX_JITTER;
+    const baseDelayJitter = spreadJitter * spreadJitter * MAX_JITTER;
     const basePitchJitter = pitchJitter;
 
     const drawbarWeights = [

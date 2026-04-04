@@ -60,7 +60,10 @@ export function PositionControl({
     if (!hold) engine?.sendCommand("envRelease");
   }, [engine, hold]);
 
-  const jitterWidth = positionJitter * width * 0.25;
+  const MAX_JITTER = 176400;
+  const jitterWidth = spectrogram
+    ? (2 * positionJitter * positionJitter * MAX_JITTER / spectrogram.bufferLength) * width
+    : 0;
 
   const pitchClass = spectrogram ? spectrogram.pitchAt(position) : "";
 

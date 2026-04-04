@@ -67,6 +67,7 @@ export interface SpectrogramData {
   data: Float64Array;
   numBins: number;
   numFrames: number;
+  bufferLength: number;
   pitchAt: PitchLookup;
 }
 
@@ -149,5 +150,5 @@ export function computeSpectrogram(
     return pitchClasses[idx] ?? "";
   };
 
-  return { data: out, numBins, numFrames: frames, pitchAt };
+  return { data: out, numBins, numFrames: frames, bufferLength: samples.length, pitchAt };
 }
