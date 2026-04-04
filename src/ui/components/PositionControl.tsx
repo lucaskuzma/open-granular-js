@@ -31,15 +31,38 @@ export function PositionControl({
   const [, setTick] = useState(0);
   useEffect(() => slotManager.subscribe(() => setTick((n) => n + 1)), [slotManager]);
 
+  type LockedAxis = null | "x" | "y";
+  const startPos = useRef<{ cx: number; cy: number } | null>(null);
+  const lockedAxis = useRef<LockedAxis>(null);
+
   const update = useCallback(
     (e: RPointerEvent) => {
       const el = ref.current;
       if (!el) return;
       const rect = el.getBoundingClientRect();
-      const nx = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-      const ny = Math.max(0, Math.min(1, 1 - (e.clientY - rect.top) / rect.height));
-      store.set("position", nx);
-      store.set("positionJitter", ny);
+
+      let lock: LockedAxis = null;
+      if (e.shiftKey && startPos.current) {
+        if (lockedAxis.current) {
+          lock = lockedAxis.current;
+        } else {
+          const dx = Math.abs(e.clientX - startPos.current.cx);
+          const dy = Math.abs(e.clientY - startPos.current.cy);
+          lock = dx >= dy ? "x" : "y";
+          lockedAxis.current = lock;
+        }
+      } else {
+        lockedAxis.current = null;
+      }
+
+      if (lock !== "y") {
+        const nx = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+        store.set("position", nx);
+      }
+      if (lock !== "x") {
+        const ny = Math.max(0, Math.min(1, 1 - (e.clientY - rect.top) / rect.height));
+        store.set("positionJitter", ny);
+      }
     },
     [store],
   );
@@ -49,8 +72,10 @@ export function PositionControl({
   const onPointerDown = useCallback(
     (e: RPointerEvent) => {
       (e.target as HTMLElement).setPointerCapture(e.pointerId);
+      startPos.current = { cx: e.clientX, cy: e.clientY };
+      lockedAxis.current = null;
       slotManager.excludeFromInterp("position", "positionJitter");
-      update(e);
+      if (!e.shiftKey) update(e);
       if (!hold) engine?.sendCommand("envAttack");
     },
     [update, engine, slotManager, hold],

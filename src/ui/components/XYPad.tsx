@@ -16,6 +16,8 @@ interface XYPadProps {
   slotManager?: SlotManager;
 }
 
+type LockedAxis = null | "x" | "y";
+
 export function XYPad({ store, xKey, yKey, label, size = 96, vertical, disabled, onDragStart, slotManager }: XYPadProps) {
   const ref = useRef<HTMLDivElement>(null);
   const x = useParam(store, xKey);
@@ -30,18 +32,38 @@ export function XYPad({ store, xKey, yKey, label, size = 96, vertical, disabled,
   const targetY = yKey ? slotManager?.getTarget(yKey) : undefined;
   const blinkVisible = !lerping || Math.floor(performance.now() / 100) % 2 === 0;
 
+  const startPos = useRef<{ cx: number; cy: number } | null>(null);
+  const lockedAxis = useRef<LockedAxis>(null);
+
   const update = useCallback(
     (e: RPointerEvent) => {
       const el = ref.current;
       if (!el) return;
       const rect = el.getBoundingClientRect();
+
+      let lock: LockedAxis = null;
+      if (e.shiftKey && yKey && startPos.current) {
+        if (lockedAxis.current) {
+          lock = lockedAxis.current;
+        } else {
+          const dx = Math.abs(e.clientX - startPos.current.cx);
+          const dy = Math.abs(e.clientY - startPos.current.cy);
+          lock = dx >= dy ? "x" : "y";
+          lockedAxis.current = lock;
+        }
+      } else {
+        lockedAxis.current = null;
+      }
+
       if (vertical) {
         const ny = Math.max(0, Math.min(1, 1 - (e.clientY - rect.top) / rect.height));
         store.set(xKey, ny);
       } else {
-        const nx = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-        store.set(xKey, nx);
-        if (yKey) {
+        if (lock !== "y") {
+          const nx = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+          store.set(xKey, nx);
+        }
+        if (yKey && lock !== "x") {
           const ny = Math.max(0, Math.min(1, 1 - (e.clientY - rect.top) / rect.height));
           store.set(yKey, ny);
         }
@@ -54,7 +76,9 @@ export function XYPad({ store, xKey, yKey, label, size = 96, vertical, disabled,
     (e: RPointerEvent) => {
       if (disabled) return;
       (e.target as HTMLElement).setPointerCapture(e.pointerId);
-      update(e);
+      startPos.current = { cx: e.clientX, cy: e.clientY };
+      lockedAxis.current = null;
+      if (!e.shiftKey || !yKey) update(e);
       onDragStart?.();
     },
     [update, onDragStart, disabled],
