@@ -153,7 +153,7 @@ class Grain {
 
     const maxRamp = Math.floor(this.length / 2);
     this.ramp = Math.min(Math.floor(grainRamp), maxRamp);
-    this.pitch = Math.max(0.05, grainPitch + (Math.random() * 2 - 1) * pitchJitter);
+    this.pitch = Math.max(0.05, grainPitch * Math.pow(2, (Math.random() * 2 - 1) * pitchJitter));
   }
 }
 
