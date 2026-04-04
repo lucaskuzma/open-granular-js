@@ -64,6 +64,7 @@ export default function App() {
       setStatus("Decoding...");
       try {
         const buf = await loadBufferFromFile(ctx, file);
+        slotManager.clearAll();
         setBuffer(buf);
         if (running) {
           granularEngine.loadBuffer(buf);

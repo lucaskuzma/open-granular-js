@@ -52,6 +52,12 @@ export class SlotManager {
     this.notify();
   }
 
+  clearAll() {
+    this.cancelInterp();
+    this.slots.fill(null);
+    this.notify();
+  }
+
   save(index: number) {
     if (index < 0 || index >= SLOT_KEYS.length) return;
     this.slots[index] = this.store.snapshot();
