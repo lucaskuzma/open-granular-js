@@ -52,9 +52,7 @@ export function LabelControl({ store, paramKey, label, width = 32, onDragStart }
         gap: 2,
       }}
     >
-      <span style={{ fontFamily: "monospace", fontSize: 16, color: "#000" }}>
-        {display}
-      </span>
+      <span style={{ fontFamily: "monospace", fontSize: 12, color: "#000" }}>{display}</span>
       <span style={{ fontSize: 9, color: "#666" }}>{label}</span>
     </div>
   );
