@@ -299,8 +299,8 @@ class GranularProcessor extends AudioWorkletProcessor {
 
     const hold = this._p(parameters, "hold") >= 0.5 ? 1 : 0;
 
-    this.lfo1.period = Math.max(MIN_LFO_PERIOD, Math.floor(lfo1Period * MAX_LFO_PERIOD));
-    this.lfo2.period = Math.max(MIN_LFO_PERIOD, Math.floor(lfo2Period * MAX_LFO_PERIOD));
+    this.lfo1.period = Math.floor(MIN_LFO_PERIOD * Math.pow(MAX_LFO_PERIOD / MIN_LFO_PERIOD, lfo1Period));
+    this.lfo2.period = Math.floor(MIN_LFO_PERIOD * Math.pow(MAX_LFO_PERIOD / MIN_LFO_PERIOD, lfo2Period));
     this.env1.attackTime = Math.floor(env1Attack * MAX_ATTACK_TIME);
     this.env1.releaseTime = Math.floor(env1Release * MAX_RELEASE_TIME);
 

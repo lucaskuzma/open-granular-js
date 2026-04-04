@@ -60,8 +60,8 @@ export function GranularPanel({ store, engine, buffer, slotManager }: GranularPa
       <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "flex-start" }}>
         <XYPad store={store} slotManager={slotManager} xKey="density" label="density" size={PAD_SIZE} onDragStart={() => slotManager.excludeFromInterp("density")} />
         <XYPad store={store} slotManager={slotManager} xKey="ramp" label="ramp" size={PAD_SIZE} onDragStart={() => slotManager.excludeFromInterp("ramp")} />
-        <XYPad store={store} slotManager={slotManager} xKey="lfo1Period" label="lfo1 rate" size={PAD_SIZE} onDragStart={() => slotManager.excludeFromInterp("lfo1Period")} />
-        <XYPad store={store} slotManager={slotManager} xKey="lfo2Period" label="lfo2 rate" size={PAD_SIZE} onDragStart={() => slotManager.excludeFromInterp("lfo2Period")} />
+        <XYPad store={store} slotManager={slotManager} xKey="lfo1Period" label="lfo1 period" size={PAD_SIZE} onDragStart={() => slotManager.excludeFromInterp("lfo1Period")} />
+        <XYPad store={store} slotManager={slotManager} xKey="lfo2Period" label="lfo2 period" size={PAD_SIZE} onDragStart={() => slotManager.excludeFromInterp("lfo2Period")} />
       </div>
 
       <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "flex-start" }}>
