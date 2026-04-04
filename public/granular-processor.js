@@ -287,7 +287,7 @@ class GranularProcessor extends AudioWorkletProcessor {
     const baseDelay = Math.floor(spread * MAX_SIZE);
     const maxRamp = Math.floor(baseLength / 2);
     const baseRamp = Math.floor(ramp * maxRamp);
-    const basePitch = pitch * 2;
+    const basePitch = Math.pow(2, (pitch - 0.5) * 2);
     const baseIndexJitter = positionJitter * MAX_JITTER;
     const baseLengthJitter = sizeJitter * MAX_JITTER;
     const baseDelayJitter = spreadJitter * MAX_JITTER;
