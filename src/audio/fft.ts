@@ -59,21 +59,35 @@ function mixChannels(buffer: AudioBuffer): Float32Array {
   return mixed;
 }
 
+const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+
+export type PitchLookup = (position: number) => string;
+
+export interface SpectrogramData {
+  data: Float64Array;
+  numBins: number;
+  numFrames: number;
+  pitchAt: PitchLookup;
+}
+
 /**
  * STFT spectrogram of an AudioBuffer.
- * Returns a flat Float64Array of shape [numFrames × numBins] in row-major order,
- * where each value is a raw magnitude.
+ * Returns a flat Float64Array of shape [numFrames × numBins] in row-major order
+ * (raw magnitudes), plus a pitch class string per frame derived from the peak bin.
  */
 export function computeSpectrogram(
   buffer: AudioBuffer,
   numFrames: number,
-  fftSize = 1024,
-): { data: Float64Array; numBins: number; numFrames: number } {
+  fftSize = 4096,
+): SpectrogramData {
   const samples = mixChannels(buffer);
+  const sampleRate = buffer.sampleRate;
   const numBins = fftSize / 2;
   const hop = Math.max(1, Math.floor(samples.length / numFrames));
   const frames = Math.min(numFrames, Math.ceil(samples.length / hop));
   const out = new Float64Array(frames * numBins);
+  const peakBins = new Float64Array(frames);
+  const peakMags = new Float64Array(frames);
 
   for (let f = 0; f < frames; f++) {
     const offset = f * hop;
@@ -88,12 +102,52 @@ export function computeSpectrogram(
     fft(re, im);
 
     const row = f * numBins;
+    let maxBin = 1;
+    let maxMag = 0;
     for (let i = 0; i < numBins; i++) {
       const r = re[i]!;
       const m = im[i]!;
-      out[row + i] = Math.sqrt(r * r + m * m);
+      const mag = Math.sqrt(r * r + m * m);
+      out[row + i] = mag;
+      if (i > 0 && mag > maxMag) {
+        maxMag = mag;
+        maxBin = i;
+      }
     }
+
+    // Parabolic interpolation for sub-bin accuracy
+    let interpBin: number = maxBin;
+    if (maxBin > 0 && maxBin < numBins - 1) {
+      const a = out[row + maxBin - 1]!;
+      const b = out[row + maxBin]!;
+      const c = out[row + maxBin + 1]!;
+      const denom = 2 * b - a - c;
+      if (denom > 0) interpBin = maxBin + (a - c) / (2 * denom);
+    }
+
+    peakBins[f] = interpBin;
+    peakMags[f] = maxMag;
   }
 
-  return { data: out, numBins, numFrames: frames };
+  let globalPeak = 0;
+  for (let f = 0; f < frames; f++) {
+    if (peakMags[f]! > globalPeak) globalPeak = peakMags[f]!;
+  }
+  const threshold = globalPeak * 0.01;
+
+  const pitchClasses: string[] = new Array(frames);
+  for (let f = 0; f < frames; f++) {
+    if (peakMags[f]! < threshold) { pitchClasses[f] = ""; continue; }
+    const freq = peakBins[f]! * sampleRate / fftSize;
+    if (freq < 20) { pitchClasses[f] = ""; continue; }
+    const midi = Math.round(12 * Math.log2(freq / 440) + 69);
+    pitchClasses[f] = NOTE_NAMES[((midi % 12) + 12) % 12]!;
+  }
+
+  const pitchAt: PitchLookup = (position) => {
+    const idx = Math.round(position * (frames - 1));
+    return pitchClasses[idx] ?? "";
+  };
+
+  return { data: out, numBins, numFrames: frames, pitchAt };
 }

@@ -1,6 +1,8 @@
+import { useMemo } from "react";
 import type { ParamStore } from "../engine/ParamStore";
 import type { SynthEngine } from "../engine/types";
 import type { SlotManager } from "../control/SlotManager";
+import { computeSpectrogram } from "../audio/fft";
 import { XYPad } from "./components/XYPad";
 import { HarmonicsPad } from "./components/HarmonicsPad";
 import { LabelControl } from "./components/LabelControl";
@@ -17,9 +19,14 @@ interface GranularPanelProps {
 }
 
 const PAD_SIZE = 96;
+const SCRUBBER_WIDTH = 4 * PAD_SIZE + 3 * 48;
 
 export function GranularPanel({ store, engine, buffer, slotManager }: GranularPanelProps) {
   const hold = useParam(store, "hold") >= 0.5;
+  const spectrogram = useMemo(
+    () => buffer ? computeSpectrogram(buffer, SCRUBBER_WIDTH) : null,
+    [buffer],
+  );
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16, padding: 16 }}>
@@ -27,9 +34,9 @@ export function GranularPanel({ store, engine, buffer, slotManager }: GranularPa
       <PositionControl
         store={store}
         engine={engine}
-        buffer={buffer}
+        spectrogram={spectrogram}
         slotManager={slotManager}
-        width={4 * PAD_SIZE + 3 * 48}
+        width={SCRUBBER_WIDTH}
       />
 
       {/* Main XY pads with modulation depths underneath */}
@@ -72,7 +79,7 @@ export function GranularPanel({ store, engine, buffer, slotManager }: GranularPa
       </div>
 
       {/* Slot row */}
-      <SlotRow slotManager={slotManager} />
+      <SlotRow slotManager={slotManager} pitchAt={spectrogram?.pitchAt ?? null} />
     </div>
   );
 }

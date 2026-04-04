@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { SlotManager, SLOT_KEYS, type SlotData } from "../../control/SlotManager";
+import type { PitchLookup } from "../../audio/fft";
 import { colorFor, DISABLED } from "../colors";
 
 interface SlotRowProps {
   slotManager: SlotManager;
+  pitchAt: PitchLookup | null;
 }
 
 const SLOT_SIZE = 32;
@@ -21,7 +23,7 @@ function quadrantColor(data: SlotData | null, key: string, jitterKey: string): s
   return colorFor(data[key] ?? 0, data[jitterKey] ?? 0);
 }
 
-export function SlotRow({ slotManager }: SlotRowProps) {
+export function SlotRow({ slotManager, pitchAt }: SlotRowProps) {
   const [, setTick] = useState(0);
   useEffect(() => slotManager.subscribe(() => setTick((n) => n + 1)), [slotManager]);
 
@@ -66,6 +68,7 @@ export function SlotRow({ slotManager }: SlotRowProps) {
               ))}
             </div>
             <span style={{ fontSize: 11, color: "#999", userSelect: "none" }}>{letter}</span>
+            <span style={{ fontSize: 9, fontWeight: 600, color: "#999", userSelect: "none", minHeight: 12 }}>{data && pitchAt ? pitchAt(data.position ?? 0) : ""}</span>
           </div>
         );
       })}

@@ -2,6 +2,7 @@ import { useRef, useCallback, useEffect, useState } from "react";
 import type { PointerEvent as RPointerEvent } from "react";
 import type { ParamStore } from "../../engine/ParamStore";
 import type { SynthEngine } from "../../engine/types";
+import type { SpectrogramData } from "../../audio/fft";
 import { SlotManager, SLOT_KEYS } from "../../control/SlotManager";
 import { useParam } from "../hooks";
 import { SpectrumView } from "./SpectrumView";
@@ -9,7 +10,7 @@ import { SpectrumView } from "./SpectrumView";
 interface PositionControlProps {
   store: ParamStore;
   engine: SynthEngine | null;
-  buffer: AudioBuffer | null;
+  spectrogram: SpectrogramData | null;
   slotManager: SlotManager;
   width: number;
   height?: number;
@@ -18,7 +19,7 @@ interface PositionControlProps {
 export function PositionControl({
   store,
   engine,
-  buffer,
+  spectrogram,
   slotManager,
   width,
   height = 96,
@@ -61,6 +62,8 @@ export function PositionControl({
 
   const jitterWidth = positionJitter * width * 0.25;
 
+  const pitchClass = spectrogram ? spectrogram.pitchAt(position) : "";
+
   return (
     <>
     <div
@@ -82,7 +85,7 @@ export function PositionControl({
         border: "1px solid rgba(0,0,0,0.1)",
       }}
     >
-      <SpectrumView buffer={buffer} width={width} height={height} />
+      <SpectrumView spectrogram={spectrogram} width={width} height={height} />
 
       {/* Position indicator */}
       <div
@@ -97,6 +100,25 @@ export function PositionControl({
           pointerEvents: "none",
         }}
       />
+
+      {/* Pitch class label */}
+      {pitchClass && (
+        <span
+          style={{
+            position: "absolute",
+            left: `${position * 100}%`,
+            bottom: 4,
+            transform: "translateX(-50%)",
+            fontSize: 11,
+            fontWeight: 600,
+            color: "rgba(0,0,0,0.7)",
+            pointerEvents: "none",
+            userSelect: "none",
+          }}
+        >
+          {pitchClass}
+        </span>
+      )}
 
       {/* Jitter range */}
       <div

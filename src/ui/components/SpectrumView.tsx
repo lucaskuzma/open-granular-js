@@ -1,15 +1,15 @@
 import { useRef, useEffect } from "react";
-import { computeSpectrogram } from "../../audio/fft";
+import type { SpectrogramData } from "../../audio/fft";
 
 interface SpectrumViewProps {
-  buffer: AudioBuffer | null;
+  spectrogram: SpectrogramData | null;
   width: number;
   height: number;
 }
 
 const DB_FLOOR = -60;
 
-export function SpectrumView({ buffer, width, height }: SpectrumViewProps) {
+export function SpectrumView({ spectrogram, width, height }: SpectrumViewProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -24,7 +24,7 @@ export function SpectrumView({ buffer, width, height }: SpectrumViewProps) {
     canvas.width = pw;
     canvas.height = ph;
 
-    if (!buffer) {
+    if (!spectrogram) {
       ctx.scale(dpr, dpr);
       ctx.fillStyle = "#fff";
       ctx.fillRect(0, 0, width, height);
@@ -35,7 +35,7 @@ export function SpectrumView({ buffer, width, height }: SpectrumViewProps) {
       return;
     }
 
-    const { data, numBins, numFrames } = computeSpectrogram(buffer, pw);
+    const { data, numBins, numFrames } = spectrogram;
 
     let peak = 0;
     for (let i = 0; i < data.length; i++) {
@@ -51,7 +51,6 @@ export function SpectrumView({ buffer, width, height }: SpectrumViewProps) {
       const row = frame * numBins;
 
       for (let y = 0; y < ph; y++) {
-        // y=0 top = high freq, y=ph bottom = low freq
         const freqT = 1 - y / ph;
         const bin = Math.min(Math.floor(freqT * numBins), numBins - 1);
         const raw = data[row + bin]! / peak;
@@ -59,7 +58,6 @@ export function SpectrumView({ buffer, width, height }: SpectrumViewProps) {
         const db = 20 * Math.log10(Math.max(raw, 1e-10));
         const m = Math.max(0, 1 - db / DB_FLOOR);
 
-        // Pastel Y-sweep at x=0.5: blend (r, 128, 255) with white by magnitude
         const idx = (y * pw + x) * 4;
         px[idx] = Math.round(255 * (1 - m * freqT));
         px[idx + 1] = Math.round(255 - m * 127);
@@ -69,7 +67,7 @@ export function SpectrumView({ buffer, width, height }: SpectrumViewProps) {
     }
 
     ctx.putImageData(img, 0, 0);
-  }, [buffer, width, height]);
+  }, [spectrogram, width, height]);
 
   return (
     <canvas
