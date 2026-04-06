@@ -25,6 +25,8 @@ export const GRANULAR_PARAMS: ParamDefinition[] = [
   { key: "lfo1Size",     label: "LFO1 Size",     min: 0, max: 1, default: 0 },
   { key: "lfo1Spread",   label: "LFO1 Spread",   min: 0, max: 1, default: 0 },
   { key: "lfo1Pitch",    label: "LFO1 Pitch",    min: 0, max: 1, default: 0 },
+  { key: "lfo1HarmonicPosition", label: "LFO1 H-Pos",  min: 0, max: 1, default: 0 },
+  { key: "lfo1HarmonicGain",     label: "LFO1 H-Gain", min: 0, max: 1, default: 0 },
 
   // --- LFO 2 ---
   { key: "lfo2Period",   label: "LFO2 Period",   min: 0, max: 1, default: 0.5 },
@@ -32,6 +34,8 @@ export const GRANULAR_PARAMS: ParamDefinition[] = [
   { key: "lfo2Size",     label: "LFO2 Size",     min: 0, max: 1, default: 0 },
   { key: "lfo2Spread",   label: "LFO2 Spread",   min: 0, max: 1, default: 0 },
   { key: "lfo2Pitch",    label: "LFO2 Pitch",    min: 0, max: 1, default: 0 },
+  { key: "lfo2HarmonicPosition", label: "LFO2 H-Pos",  min: 0, max: 1, default: 0 },
+  { key: "lfo2HarmonicGain",     label: "LFO2 H-Gain", min: 0, max: 1, default: 0 },
 
   // --- Envelope ---
   { key: "env1Attack",   label: "Env Attack",    min: 0, max: 1, default: 0.25 },

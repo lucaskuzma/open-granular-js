@@ -61,6 +61,12 @@ export function GranularPanel({ store, engine, buffer, slotManager }: GranularPa
           <XYPad store={store} slotManager={slotManager} xKey="drawbar9" label="1'" size={PAD_SIZE} vertical onDragStart={() => slotManager.excludeFromInterp("drawbar9")} />
         </div>
         <HarmonicsPad store={store} slotManager={slotManager} />
+        <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+          <LabelControl store={store} paramKey="lfo1HarmonicPosition" label="lfo1 h-pos" onDragStart={() => slotManager.excludeFromInterp("lfo1HarmonicPosition")} />
+          <LabelControl store={store} paramKey="lfo1HarmonicGain" label="lfo1 h-gain" onDragStart={() => slotManager.excludeFromInterp("lfo1HarmonicGain")} />
+          <LabelControl store={store} paramKey="lfo2HarmonicPosition" label="lfo2 h-pos" onDragStart={() => slotManager.excludeFromInterp("lfo2HarmonicPosition")} />
+          <LabelControl store={store} paramKey="lfo2HarmonicGain" label="lfo2 h-gain" onDragStart={() => slotManager.excludeFromInterp("lfo2HarmonicGain")} />
+        </div>
       </div>
 
       {/* Single-axis pads and controls */}

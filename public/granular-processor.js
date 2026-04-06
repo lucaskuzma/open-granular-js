@@ -101,6 +101,7 @@ class Grain {
     this.delay = 0;
     this.ramp = 735;
     this.pitch = 1;
+    this.harmonicIndex = 2;
   }
 
   sample(dataL, dataR, bufferLength) {
@@ -194,6 +195,10 @@ class GranularProcessor extends AudioWorkletProcessor {
       { name: "env1Spread",     defaultValue: 0,    minValue: 0,    maxValue: 1,    automationRate: "k-rate" },
       { name: "env1Pitch",      defaultValue: 0,    minValue: 0,    maxValue: 1,    automationRate: "k-rate" },
       { name: "hold",           defaultValue: 1,    minValue: 0,    maxValue: 1,    automationRate: "k-rate" },
+      { name: "lfo1HarmonicPosition", defaultValue: 0, minValue: 0, maxValue: 1, automationRate: "k-rate" },
+      { name: "lfo1HarmonicGain",     defaultValue: 0, minValue: 0, maxValue: 1, automationRate: "k-rate" },
+      { name: "lfo2HarmonicPosition", defaultValue: 0, minValue: 0, maxValue: 1, automationRate: "k-rate" },
+      { name: "lfo2HarmonicGain",     defaultValue: 0, minValue: 0, maxValue: 1, automationRate: "k-rate" },
       { name: "drawbar1",      defaultValue: 0,    minValue: 0,    maxValue: 1,    automationRate: "k-rate" },
       { name: "drawbar2",      defaultValue: 0,    minValue: 0,    maxValue: 1,    automationRate: "k-rate" },
       { name: "drawbar3",      defaultValue: 1,    minValue: 0,    maxValue: 1,    automationRate: "k-rate" },
@@ -220,6 +225,8 @@ class GranularProcessor extends AudioWorkletProcessor {
     this.lfo2 = new LFO();
     this.env1 = new ASREnvelope();
     this.prevHold = 1;
+    this.harmonicPositions = new Float64Array(HARMONIC_COUNT);
+    this.harmonicGains = new Float64Array(HARMONIC_COUNT);
 
     this.port.onmessage = (e) => {
       const { type } = e.data;
@@ -250,13 +257,13 @@ class GranularProcessor extends AudioWorkletProcessor {
   _pickHarmonic(weights) {
     let total = 0;
     for (let i = 0; i < HARMONIC_COUNT; i++) total += weights[i];
-    if (total <= 0) return 1.0;
+    if (total <= 0) return 2;
     let r = Math.random() * total;
     for (let i = 0; i < HARMONIC_COUNT; i++) {
       r -= weights[i];
-      if (r <= 0) return HARMONIC_MULTIPLIERS[i];
+      if (r <= 0) return i;
     }
-    return HARMONIC_MULTIPLIERS[HARMONIC_COUNT - 1];
+    return HARMONIC_COUNT - 1;
   }
 
   process(_inputs, outputs, parameters) {
@@ -289,6 +296,11 @@ class GranularProcessor extends AudioWorkletProcessor {
     const lfo2Size = this._p(parameters, "lfo2Size");
     const lfo2Spread = this._p(parameters, "lfo2Spread");
     const lfo2Pitch = this._p(parameters, "lfo2Pitch");
+
+    const lfo1HarmonicPosition = this._p(parameters, "lfo1HarmonicPosition");
+    const lfo1HarmonicGain = this._p(parameters, "lfo1HarmonicGain");
+    const lfo2HarmonicPosition = this._p(parameters, "lfo2HarmonicPosition");
+    const lfo2HarmonicGain = this._p(parameters, "lfo2HarmonicGain");
 
     const env1Attack = this._p(parameters, "env1Attack");
     const env1Release = this._p(parameters, "env1Release");
@@ -364,6 +376,17 @@ class GranularProcessor extends AudioWorkletProcessor {
       const lfo2L = this.lfo2.level;
       const envL = this.env1.level;
 
+      const lfo1Phase = 2 * Math.PI * this.lfo1.offset / this.lfo1.period;
+      const lfo2Phase = 2 * Math.PI * this.lfo2.offset / this.lfo2.period;
+      const phaseStep = 2 * Math.PI / HARMONIC_COUNT;
+      for (let h = 0; h < HARMONIC_COUNT; h++) {
+        const v1 = Math.sin(lfo1Phase + h * phaseStep);
+        const v2 = Math.sin(lfo2Phase + h * phaseStep);
+        this.harmonicPositions[h] = v1 * lfo1HarmonicPosition * MAX_JITTER
+                                   + v2 * lfo2HarmonicPosition * MAX_JITTER;
+        this.harmonicGains[h] = 1 + v1 * lfo1HarmonicGain + v2 * lfo2HarmonicGain;
+      }
+
       const modIndex = baseIndex
         + lfo1L * lfo1Position * MAX_JITTER
         + lfo2L * lfo2Position * MAX_JITTER
@@ -385,14 +408,15 @@ class GranularProcessor extends AudioWorkletProcessor {
         const grain = this.grains[g];
 
         if (grain.atCycleBoundary) {
-          const harmonicMul = this._pickHarmonic(drawbarWeights);
+          const harmonicIdx = this._pickHarmonic(drawbarWeights);
+          grain.harmonicIndex = harmonicIdx;
           grain.resample(
             bufLen,
-            modIndex,
+            modIndex + this.harmonicPositions[harmonicIdx],
             Math.max(1, modLength),
             Math.max(0, modDelay),
             baseRamp,
-            modPitch * harmonicMul,
+            modPitch * HARMONIC_MULTIPLIERS[harmonicIdx],
             baseIndexJitter,
             baseLengthJitter,
             baseDelayJitter,
@@ -403,8 +427,9 @@ class GranularProcessor extends AudioWorkletProcessor {
         grain._sampleL = 0;
         grain._sampleR = 0;
         grain.sample(this.dataL, this.dataR, bufLen);
-        sumL += grain._sampleL;
-        sumR += grain._sampleR;
+        const hGain = Math.max(0, this.harmonicGains[grain.harmonicIndex]);
+        sumL += grain._sampleL * hGain;
+        sumR += grain._sampleR * hGain;
       }
 
       const envVolume = volume - (1 - envL);
