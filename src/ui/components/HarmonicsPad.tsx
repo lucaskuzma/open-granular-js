@@ -40,7 +40,7 @@ export function HarmonicsPad({ store, slotManager, height = 24 }: HarmonicsPadPr
       const newX = Math.min(rawX, snap.startX);
       const ratio = newX / snap.startX;
       for (const key of NON_FUNDAMENTAL_KEYS) {
-        store.set(key, snap.values[key] * ratio);
+        store.set(key, (snap.values[key] ?? 0) * ratio);
       }
     },
     [store],
@@ -53,7 +53,7 @@ export function HarmonicsPad({ store, slotManager, height = 24 }: HarmonicsPadPr
       for (const key of NON_FUNDAMENTAL_KEYS) {
         values[key] = store.get(key);
       }
-      const startX = NON_FUNDAMENTAL_KEYS.reduce((sum, k) => sum + values[k], 0) / NON_FUNDAMENTAL_KEYS.length;
+      const startX = NON_FUNDAMENTAL_KEYS.reduce((sum, k) => sum + (values[k] ?? 0), 0) / NON_FUNDAMENTAL_KEYS.length;
       snapshotRef.current = { startX, values };
       slotManager.excludeFromInterp(...NON_FUNDAMENTAL_KEYS);
       update(e);
