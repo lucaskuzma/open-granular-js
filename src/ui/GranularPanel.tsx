@@ -66,6 +66,8 @@ export function GranularPanel({ store, engine, buffer, slotManager }: GranularPa
           <LabelControl store={store} paramKey="lfo1HarmonicGain" label="lfo1 h-gain" onDragStart={() => slotManager.excludeFromInterp("lfo1HarmonicGain")} />
           <LabelControl store={store} paramKey="lfo2HarmonicPosition" label="lfo2 h-pos" onDragStart={() => slotManager.excludeFromInterp("lfo2HarmonicPosition")} />
           <LabelControl store={store} paramKey="lfo2HarmonicGain" label="lfo2 h-gain" onDragStart={() => slotManager.excludeFromInterp("lfo2HarmonicGain")} />
+          <LabelControl store={store} paramKey="harmonicLfoPositionTilt" label="h-pos tilt" onDragStart={() => slotManager.excludeFromInterp("harmonicLfoPositionTilt")} />
+          <LabelControl store={store} paramKey="harmonicLfoGainTilt" label="h-gain tilt" onDragStart={() => slotManager.excludeFromInterp("harmonicLfoGainTilt")} />
         </div>
       </div>
 

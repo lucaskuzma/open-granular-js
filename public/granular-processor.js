@@ -12,6 +12,7 @@ const MAX_LFO_PERIOD = 441000;
 
 const HARMONIC_COUNT = 9;
 const HARMONIC_MULTIPLIERS = [0.5, 1.5, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 8.0];
+const HARMONIC_TILT_DISTANCE = [1.0, 0.5, 0.0, 1/6, 2/6, 3/6, 4/6, 5/6, 1.0];
 
 // ─── LFO ────────────────────────────────────────────────────────────────────
 
@@ -199,6 +200,8 @@ class GranularProcessor extends AudioWorkletProcessor {
       { name: "lfo1HarmonicGain",     defaultValue: 0, minValue: 0, maxValue: 1, automationRate: "k-rate" },
       { name: "lfo2HarmonicPosition", defaultValue: 0, minValue: 0, maxValue: 1, automationRate: "k-rate" },
       { name: "lfo2HarmonicGain",     defaultValue: 0, minValue: 0, maxValue: 1, automationRate: "k-rate" },
+      { name: "harmonicLfoPositionTilt", defaultValue: 1, minValue: 0, maxValue: 1, automationRate: "k-rate" },
+      { name: "harmonicLfoGainTilt",     defaultValue: 1, minValue: 0, maxValue: 1, automationRate: "k-rate" },
       { name: "drawbar1",      defaultValue: 0,    minValue: 0,    maxValue: 1,    automationRate: "k-rate" },
       { name: "drawbar2",      defaultValue: 0,    minValue: 0,    maxValue: 1,    automationRate: "k-rate" },
       { name: "drawbar3",      defaultValue: 1,    minValue: 0,    maxValue: 1,    automationRate: "k-rate" },
@@ -302,6 +305,9 @@ class GranularProcessor extends AudioWorkletProcessor {
     const lfo2HarmonicPosition = this._p(parameters, "lfo2HarmonicPosition");
     const lfo2HarmonicGain = this._p(parameters, "lfo2HarmonicGain");
 
+    const posTilt = this._p(parameters, "harmonicLfoPositionTilt");
+    const gainTilt = this._p(parameters, "harmonicLfoGainTilt");
+
     const env1Attack = this._p(parameters, "env1Attack");
     const env1Release = this._p(parameters, "env1Release");
     const env1Position = this._p(parameters, "env1Position");
@@ -382,9 +388,11 @@ class GranularProcessor extends AudioWorkletProcessor {
       for (let h = 0; h < HARMONIC_COUNT; h++) {
         const v1 = Math.sin(lfo1Phase + h * phaseStep);
         const v2 = Math.sin(lfo2Phase + h * phaseStep);
-        this.harmonicPositions[h] = v1 * lfo1HarmonicPosition * MAX_JITTER
-                                   + v2 * lfo2HarmonicPosition * MAX_JITTER;
-        this.harmonicGains[h] = 1 + v1 * lfo1HarmonicGain + v2 * lfo2HarmonicGain;
+        const posTiltScale = 1 - posTilt + posTilt * HARMONIC_TILT_DISTANCE[h];
+        const gainTiltScale = 1 - gainTilt + gainTilt * HARMONIC_TILT_DISTANCE[h];
+        this.harmonicPositions[h] = (v1 * lfo1HarmonicPosition + v2 * lfo2HarmonicPosition)
+                                     * posTiltScale * MAX_JITTER;
+        this.harmonicGains[h] = 1 + (v1 * lfo1HarmonicGain + v2 * lfo2HarmonicGain) * gainTiltScale;
       }
 
       const modIndex = baseIndex

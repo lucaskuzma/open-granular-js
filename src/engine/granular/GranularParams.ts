@@ -37,6 +37,10 @@ export const GRANULAR_PARAMS: ParamDefinition[] = [
   { key: "lfo2HarmonicPosition", label: "LFO2 H-Pos",  min: 0, max: 1, default: 0 },
   { key: "lfo2HarmonicGain",     label: "LFO2 H-Gain", min: 0, max: 1, default: 0 },
 
+  // --- Harmonic LFO tilt (shared across LFO1/LFO2) ---
+  { key: "harmonicLfoPositionTilt", label: "H-Pos Tilt",  min: 0, max: 1, default: 1 },
+  { key: "harmonicLfoGainTilt",     label: "H-Gain Tilt", min: 0, max: 1, default: 1 },
+
   // --- Envelope ---
   { key: "env1Attack",   label: "Env Attack",    min: 0, max: 1, default: 0.25 },
   { key: "env1Release",  label: "Env Release",   min: 0, max: 1, default: 0.25 },
