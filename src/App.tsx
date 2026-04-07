@@ -9,6 +9,7 @@ import { ParamStore } from "./engine/ParamStore";
 import { GranularEngine } from "./engine/granular/GranularEngine";
 import { SlotManager, SLOT_KEYS } from "./control/SlotManager";
 import { GranularPanel } from "./ui/GranularPanel";
+import { getRecentFiles, addRecentFile } from "./storage/recentFiles";
 
 const audioManager = new AudioManager();
 const paramStore = new ParamStore();
@@ -21,6 +22,8 @@ export default function App() {
   const [running, setRunning] = useState(false);
   const [buffer, setBuffer] = useState<AudioBuffer | null>(null);
   const [status, setStatus] = useState("Stopped");
+  const [currentFileName, setCurrentFileName] = useState<string | null>(null);
+  const [recentFiles, setRecentFiles] = useState<string[]>(getRecentFiles);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const start = useCallback(async () => {
@@ -66,10 +69,12 @@ export default function App() {
         const buf = await loadBufferFromFile(ctx, file);
         slotManager.clearAll();
         setBuffer(buf);
+        setCurrentFileName(file.name);
         if (running) {
           granularEngine.loadBuffer(buf);
         }
         setStatus(running ? "Running" : "File loaded");
+        setRecentFiles(addRecentFile(file.name));
       } catch (err) {
         setStatus(`Decode error: ${err instanceof Error ? err.message : String(err)}`);
       }
@@ -145,6 +150,25 @@ export default function App() {
           }}
         />
 
+        {recentFiles.length > 0 && (
+          <select
+            value={currentFileName ?? ""}
+            onChange={(e) => {
+              if (e.target.value) fileInputRef.current?.click();
+            }}
+            style={selectStyle}
+          >
+            <option value="" disabled>
+              Recent files…
+            </option>
+            {recentFiles.map((name) => (
+              <option key={name} value={name}>
+                {name}
+              </option>
+            ))}
+          </select>
+        )}
+
         <span style={{ fontSize: 12, color: "#666" }}>{status}</span>
       </div>
 
@@ -162,4 +186,15 @@ const buttonStyle: React.CSSProperties = {
   borderRadius: 4,
   cursor: "pointer",
   fontSize: 13,
+};
+
+const selectStyle: React.CSSProperties = {
+  padding: "4px 8px",
+  backgroundColor: "#f0f0f0",
+  color: "#000",
+  border: "1px solid #ccc",
+  borderRadius: 4,
+  fontSize: 13,
+  maxWidth: 192,
+  cursor: "pointer",
 };
