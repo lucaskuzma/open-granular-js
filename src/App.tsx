@@ -1,10 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { AudioManager } from "./audio/AudioManager";
-import {
-  DEFAULT_AUDIO_URL,
-  loadBufferFromUrl,
-  loadBufferFromFile,
-} from "./audio/BufferLoader";
+import { DEFAULT_AUDIO_URL, loadBufferFromUrl, loadBufferFromFile } from "./audio/BufferLoader";
 import { ParamStore } from "./engine/ParamStore";
 import { GranularEngine } from "./engine/granular/GranularEngine";
 import { SlotManager, SLOT_KEYS } from "./control/SlotManager";
@@ -131,10 +127,6 @@ export default function App() {
       >
         <span style={{ fontWeight: 600, fontSize: 16 }}>Open Granular</span>
 
-        <button onClick={running ? stop : start} style={buttonStyle}>
-          {running ? "Stop" : "Start"}
-        </button>
-
         <button onClick={() => fileInputRef.current?.click()} style={buttonStyle}>
           Load File
         </button>
@@ -168,6 +160,10 @@ export default function App() {
             ))}
           </select>
         )}
+
+        <button onClick={running ? stop : start} style={buttonStyle}>
+          {running ? "Stop" : "Start"}
+        </button>
 
         <span style={{ fontSize: 12, color: "#666" }}>{status}</span>
       </div>
